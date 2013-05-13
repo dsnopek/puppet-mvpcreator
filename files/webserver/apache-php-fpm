@@ -1,0 +1,9 @@
+
+<IfModule mod_fastcgi.c>
+  Alias /php5.fcgi /var/www/php5.fcgi
+  # TODO: Arguments to try: -flush -idle-timeout 90
+  FastCGIExternalServer /var/www/php5.fcgi -socket /var/run/php5-fpm.socket -pass-header AUTHORIZATION
+  AddType application/x-httpd-fastphp5 .php
+  Action application/x-httpd-fastphp5 /php5.fcgi
+</IfModule>
+
