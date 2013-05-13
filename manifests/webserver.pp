@@ -23,6 +23,12 @@ class mvpcreator::webserver (
     ],
   }
 
+  File {
+    owner => 'root',
+    group => 'root',
+    mode  => '0644',
+  }
+
   # TODO: Does keeping this in a seperate class even make sense?
   include mvpcreator::webserver::aegir
 
@@ -96,14 +102,17 @@ class mvpcreator::webserver (
   }
 }
 
-class mvpcreator::webserver::aegir {
+class mvpcreator::webserver::aegir_config {
   $aegir_hostmaster_url = $mvpcreator::webserver::aegir_url
   $aegir_hostmaster_email = $mvpcreator::webserver::aegir_email
+  $aegir_manual_build = true
+
   # TODO: this shouldn't be necessary...
   $aegir_dev_build = true
-  $aegir_manual_build = true
   $aegir_version = '6.x-1.9'
+}
 
+class mvpcreator::webserver::aegir inherits mvpcreator::webserver::aegir_config {
   Exec {
     path => '/usr/bin:/bin',
   }
