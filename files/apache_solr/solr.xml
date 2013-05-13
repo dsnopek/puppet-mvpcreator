@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<solr persistent="true" sharedLib="lib">
+  <cores adminPath="/admin/cores" shareSchema="true" adminHandler="au.com.davehall.solr.plugins.SolrCoreAdminHandler">
+  </cores>
+</solr>
+
