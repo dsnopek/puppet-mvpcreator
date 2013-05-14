@@ -68,24 +68,25 @@ class mvpcreator::webserver (
     ensure => present,
     require => [ Apt::Sources_list['dotdeb'] ],
   }
+  package {'libapache2-mod-php5':
+    ensure => absent,
+  }
+  # TODO: make module enabling generic!
   exec {'a2enmod actions':
     creates => '/etc/apache2/mods-enabled/actions.load',
     notify => Service['apache2'],
   }
-  package {'libapache2-mod-php5':
-    ensure => absent,
+
+  # setup the Apache deflate module
+  file {'/etc/apache2/mods-available/deflate.conf':
+  	ensure => present,
+	source => "puppet:///modules/mvpcreator/webserver/apache-deflate.conf",
   }
-  # We can't purge the 'libapache2-mod-php5' package because 'aegir' depends on it,
-  # but we CAN disable the module in the Apache config
-  #exec {'a2dismod php5':
-  #  onlyif => 'test -f /etc/apache2/mods-enabled/php5.load',
-  #  notify => Service['apache2'],
-  #  require => Package['libapache2-mod-php5'],
-  #}
-  # So we can setup the dependency above...
-  #package {'libapache2-mod-php5':
-  #  ensure => present,
-  #}
+  exec {'a2enmod deflate':
+    creates => '/etc/apache2/mods-enabled/deflate.load',
+    notify => Service['apache2'],
+	require => File['/etc/apache2/mods-available/deflate.conf'],
+  }
 
   # Configure to run with FastCGI
   file {'/etc/apache2/conf.d/php-fpm':
