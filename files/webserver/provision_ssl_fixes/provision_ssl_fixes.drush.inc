@@ -29,6 +29,9 @@ function provision_ssl_fixes_provision_apache_vhost_config($uri, $data) {
     // From http://www.startssl.com/?app=21
     $config[] .= '    SSLProtocol all -SSLv2';
     $config[] .= '    SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM';
+    // Alternate config from: http://www.networking4all.com/en/support/tools/site+check/cipher+suite/
+    //$config[] .= '    SSLProtocol -ALL +SSLv3 +TLSv1';
+    //$config[] .= '    SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP';
 
     $key = $http->context->ssl_key;
     if (file_exists("$ssl_root/$key/sub.class2.server.ca.pem")) {
