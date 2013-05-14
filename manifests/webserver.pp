@@ -107,6 +107,13 @@ class mvpcreator::webserver (
     require => [ Package['php5-fpm'] ],
     notify => Service['php5-fpm'],
   }
+
+  # Setup some extensions to Aegir's provision
+  file {'/var/aegir/.drush/provision_ssl_fixes':
+    ensure => present,
+    source => "puppet:///modules/mvpcreator/webserver/provision_ssl_fixes",
+	recurse => true,
+  }
 }
 
 class mvpcreator::webserver::aegir_config {

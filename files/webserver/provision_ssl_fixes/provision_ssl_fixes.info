@@ -1,0 +1,5 @@
+core = "6.x"
+description = "Hostmaster Customizations for Mvpcreator.com"
+name = "Hostmaster Customizations for Mvpcreator.com"
+package = "MVP Creator"
+
