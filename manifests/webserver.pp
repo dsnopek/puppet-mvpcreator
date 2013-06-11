@@ -128,7 +128,7 @@ class mvpcreator::webserver::aegir_config {
 
 class mvpcreator::webserver::aegir inherits mvpcreator::webserver::aegir_config {
   Exec {
-    path => '/usr/bin:/bin',
+    path => '/usr/sbin:/usr/bin:/bin',
   }
 
   # Necessary because Exec['hostmaster-install'] depends on Package['git-core'] - bug in the

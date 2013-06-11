@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# May be necessary if base image does not have apt-utils already.
+apt-get install apt-utils
+
+# We want this to be up to date for _every_ run for magic to happen!
+
+( cd /var/cache/pbuilder/result ;
+  apt-ftparchive packages . > /var/cache/pbuilder/result/Packages
+)
+
+cat<<EOF >/var/cache/pbuilder/result/Release
+Archive: stable
+Component: main
+Origin: pbuilder
+Label: pbuilder
+Architecture: i386
+EOF
+
+cat<<EOF >/etc/apt/sources.list
+deb file:///var/cache/pbuilder/result ./
+deb http://http.us.debian.org/debian/ squeeze main contrib non-free
+deb http://www.backports.org/debian/ squeeze-backports main
+EOF
+
+cat<<EOF >/etc/apt/preferences
+Package: *
+Pin: release o=pbuilder
+Pin-Priority: 701
+
+Package: *
+Pin: release a=squeeze
+Pin-Priority: 600
+
+Package: *
+Pin: release a=squeeze-backports
+Pin-Priority: 700
+EOF
+
+apt-get update

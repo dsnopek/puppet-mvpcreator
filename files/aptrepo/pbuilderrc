@@ -1,0 +1,14 @@
+# this is your configuration file for pbuilder.
+# the file in /usr/share/pbuilder/pbuilderrc is the default template.
+# /etc/pbuilderrc is the one meant for overwritting defaults in
+# the default template
+
+# Overrides based on HOWTO here:
+#
+#   http://edseek.com/~jasonb/articles/pbuilder_backports/pbuilderbuild.html
+
+MIRRORSITE=http://ftp.us.debian.org/debian/
+DISTRIBUTION=squeeze
+HOOKDIR=/etc/pbuilder/hook.d
+BINDMOUNTS=/var/cache/pbuilder/result
+

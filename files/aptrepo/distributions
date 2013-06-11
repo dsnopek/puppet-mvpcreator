@@ -1,0 +1,20 @@
+Origin: Lingwo International, LLC
+Label: Lingwo International, LLC
+Codename: squeeze
+Architectures: i386 amd64 sources
+Components: main
+Description: MVPCreator APT Repositiory
+SignWith: yes
+DebOverride: override.squeeze
+DscOverride: override.squeeze
+
+Origin: Lingwo International, LLC
+Label: Lingwo International, LLC
+Codename: wheezy
+Architectures: i386 amd64 sources
+Components: main
+Description: MVPCreator APT Repositiory
+SignWith: yes
+DebOverride: override.wheezy
+DscOverride: override.wheezy
+
