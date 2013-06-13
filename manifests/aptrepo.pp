@@ -74,9 +74,25 @@ class mvpcreator::aptrepo::devtools {
   #   https://wiki.ubuntu.com/PbuilderHowto
   #   http://xn.pinkhamster.net/blog/tech/host-a-debian-repository-on-s3.html
 
+  File {
+  	owner => 'root',
+	group => 'root',
+  }
+
   $packages = ['pbuilder', 'debootstrap', 'fakeroot', 'devscripts', 'apt-utils', 's3cmd']
   package {$packages:
     ensure => present,
+  }
+
+  # Pin git-buildpackage the backports version
+  file {'/etc/apt/preferences.d/git-buildpackage.pref':
+    ensure => present,
+    source => "puppet:///modules/mvpcreator/aptrepo/git-buildpackage.pref",
+	notify => Exec['update_apt'],
+  }
+  package {'git-buildpackage':
+  	ensure  => present,
+	require => File['/etc/apt/preferences.d/git-buildpackage.pref'],
   }
 
   # TODO: we need a script for adding a package and syncing the repo to S3
@@ -94,6 +110,11 @@ class mvpcreator::aptrepo::devtools {
     ensure  => present,
     source  => "puppet:///modules/mvpcreator/aptrepo/pbuilder-hook.d/D01-ftparchive",
   }
+  file {'/etc/git-buildpackage/gbp.conf':
+    ensure  => present,
+    source  => "puppet:///modules/mvpcreator/aptrepo/gbp.conf",
+  }
+
 
   Exec {
     path => [
@@ -114,5 +135,6 @@ class mvpcreator::aptrepo::devtools {
   #    File['/etc/pbuilder/hook.d/D01apt-ftparchive'],
   #  ],
   #}
+
 }
 

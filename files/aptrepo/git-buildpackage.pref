@@ -1,0 +1,3 @@
+Package: git-buildpackage
+Pin: release a=squeeze-backports
+Pin-Priority: 1001
