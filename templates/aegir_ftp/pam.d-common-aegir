@@ -1,0 +1,7 @@
+# Use pam-mysql to grant access to Drupal Aegir clients.
+auth required pam_mysql.so \
+  user=nss passwd=<%= @nss_mysql_password %> host=localhost db=<%= @aegir_db_name %> table=users \
+  usercolumn=name passwdcolumn=pass crypt=3 where=status=1
+account sufficient pam_mysql.so \
+  user=nss passwd=<%= @nss_mysql_password %> host=localhost db=<%= @aegir_db_name %> table=users \
+  usercolumn=name passwdcolumn=pass crypt=3 where=status=1

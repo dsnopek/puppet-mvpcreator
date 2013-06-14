@@ -13,6 +13,11 @@ class mvpcreator::aegir_ftp (
 
   Class['mvpcreator::webserver'] -> Class['mvpcreator::aegir_ftp']
 
+  File {
+    owner   => 'root',
+    group   => 'root',
+  }
+
   package {'pure-ftpd':
     ensure  => present,
   }
@@ -21,8 +26,18 @@ class mvpcreator::aegir_ftp (
     require => Package['libnss-mysql-bg'],
   }
 
+  #file {'/etc/vsftpd.conf':
+  #  ensure => present,
+  #  source  => "puppet:///modules/mvpcreator/aegir_ftp/vsftpd.conf",
+  #  require => Package['vsftpd'],
+  #  notify  => Service['vsftpd'],
+  #}
+
   package {'libnss-mysql-bg':
-  	ensure => present,
+    ensure => present,
+  }
+  package {'libpam-mysql':
+    ensure => present,
   }
   database_user {'nss@localhost':
     password_hash => mysql_password($nss_mysql_password),
@@ -31,25 +46,47 @@ class mvpcreator::aegir_ftp (
     privileges => ['Select_priv'],
   }
 
-  File {
-    owner   => 'root',
-    group   => 'root',
-  }
-
   file {'/etc/libnss-mysql.cfg':
     ensure  => present,
     content => template('mvpcreator/aegir_ftp/libnss-mysql.cfg'),
     require => [
-	  Package['libnss-mysql-bg'],
+      Package['libnss-mysql-bg'],
       Database_user['nss@localhost'],
       Database_grant["nss@localhost/${aegir_db_name}"],
+    ],
+    notify  => Service['pure-ftpd'],
+  }
+  file {'/etc/libnss-mysql-root.cfg':
+    ensure  => absent,
+    #content => template('mvpcreator/aegir_ftp/libnss-mysql-root.cfg'),
+    require => [
+      Package['libnss-mysql-bg'],
+      Database_user['nss@localhost'],
+      Database_grant["nss@localhost/${aegir_db_name}"],
+    ],
+    #notify  => Service['pure-ftpd'],
+  }
+  file {'/etc/pam.d/common-aegir':
+    ensure  => present,
+    content => template('mvpcreator/aegir_ftp/pam.d-common-aegir'),
+    require => [
+      Package['libpam-mysql'],
+      Database_user['nss@localhost'],
+      Database_grant["nss@localhost/${aegir_db_name}"],
+    ],
+  }
+  file {'/etc/pam.d/pure-ftpd':
+    ensure  => present,
+    source  => "puppet:///modules/mvpcreator/aegir_ftp/pam.d-pure-ftpd",
+    require => [
+      File['/etc/pam.d/common-aegir'],
     ],
   }
   file {'/etc/nsswitch.conf':
     ensure  => present,
     source  => "puppet:///modules/mvpcreator/aegir_ftp/nsswitch.conf",
     require => [
-	  File['/etc/libnss-mysql.cfg'],
+      File['/etc/libnss-mysql.cfg'],
     ],
   }
 }
