@@ -1,0 +1,7 @@
+# PAM config for pure-ftpd
+
+# Standard behaviour for ftpd(8).
+auth	required	pam_listfile.so item=user sense=deny file=/etc/ftpusers onerr=succeed
+
+@include common-aegir
+
