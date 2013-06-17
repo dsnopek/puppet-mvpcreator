@@ -41,14 +41,14 @@ class mvpcreator::webserver (
     ensure => present,
     require => [ Apt::Sources_list['dotdeb'] ],
   }
-  package {'php-apc':
+  package {'php5-apc':
     ensure => present,
     require => [ Apt::Sources_list['dotdeb'] ],
   }
   file {'/etc/php5/conf.d/apc.ini':
     ensure => present,
     source => "puppet:///modules/mvpcreator/webserver/php-apc.ini",
-    require => [ Package['php5-fpm'], Package['php-apc'] ],
+    require => [ Package['php5-fpm'], Package['php5-apc'] ],
     notify => Service['php5-fpm'],
   }
   file {'/etc/php5/fpm/php.ini':
