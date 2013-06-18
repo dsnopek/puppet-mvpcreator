@@ -25,13 +25,25 @@ class mvpcreator::aegir_ftp (
     ensure => running,
     require => Package['libnss-mysql-bg'],
   }
-
-  #file {'/etc/vsftpd.conf':
-  #  ensure => present,
-  #  source  => "puppet:///modules/mvpcreator/aegir_ftp/vsftpd.conf",
-  #  require => Package['vsftpd'],
-  #  notify  => Service['vsftpd'],
-  #}
+  # TODO: Get this back to 1000 - we need to increase the Aegir uid/gid
+  file {'/etc/pure-ftpd/conf/MinUID':
+    ensure => present,
+    content => '100',
+    require => Package['pure-ftpd'],
+    notify => Service['pure-ftpd'],
+  }
+  file {'/etc/pure-ftpd/conf/ChrootEveryone':
+    ensure => present,
+    content => 'yes',
+    require => Package['pure-ftpd'],
+    notify => Service['pure-ftpd'],
+  }
+  file {'/etc/default/pure-ftpd-common':
+    ensure => present,
+    source  => "puppet:///modules/mvpcreator/aegir_ftp/pure-ftpd-common",
+    require => Package['pure-ftpd'],
+    notify => Service['pure-ftpd'],
+  }
 
   package {'libnss-mysql-bg':
     ensure => present,
