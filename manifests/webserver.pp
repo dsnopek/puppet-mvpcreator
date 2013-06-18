@@ -1,9 +1,28 @@
 
+class mvpcreator::webserver::params {
+  # TODO: can we detect the current domain name?
+  $aegir_email = 'aegir@example.com'
+
+  # TODO: can we detect if we are in Vagrant?
+  $production = false
+
+  # If we have more than 1024Mb in system memory, then we give
+  # APC 1/8 of the system memory. Otherwise, we default to 128M.
+  if ($::memorysizeinbytes > 1024 * 1024 * 1024) {
+    $apc_shm_size_mb = $::memorysizeinbytes / 1024 / 1024 / 8
+  }
+  else {
+    $apc_shm_size_mb = '128'
+  }
+  $apc_shm_size = "${apc_shm_size_mb}M"
+}
+
 class mvpcreator::webserver (
   $aegir_url,
-  $aegir_email = 'aegir@example.com',
-  $production = false
-) {
+  $aegir_email = $mvpcreator::webserver::aegir_email,
+  $production = $mvpcreator::webserver::production,
+  $apc_shm_size = $mvpcreator::webserver::apc_shm_size,
+) inherits mvpcreator::webserver::params {
 
   # We get our PHP and Apache from dotdeb
   apt::sources_list {"dotdeb":
@@ -41,13 +60,17 @@ class mvpcreator::webserver (
     ensure => present,
     require => [ Apt::Sources_list['dotdeb'] ],
   }
+  # Make sure the Debian 'php-apc' package is absent! We want dotdeb's 'php5-apc' instead.
+  package {'php-apc':
+    ensure => purged,
+  }
   package {'php5-apc':
     ensure => present,
-    require => [ Apt::Sources_list['dotdeb'] ],
+    require => [ Apt::Sources_list['dotdeb'], Package['php-apc'] ],
   }
   file {'/etc/php5/conf.d/apc.ini':
     ensure => present,
-    source => "puppet:///modules/mvpcreator/webserver/php-apc.ini",
+    content => template('mvpcreator/webserver/php-apc.ini'),
     require => [ Package['php5-fpm'], Package['php5-apc'] ],
     notify => Service['php5-fpm'],
   }
@@ -85,13 +108,13 @@ class mvpcreator::webserver (
 
   # setup the Apache deflate module
   file {'/etc/apache2/mods-available/deflate.conf':
-  	ensure => present,
-	source => "puppet:///modules/mvpcreator/webserver/apache-deflate.conf",
+    ensure => present,
+    source => "puppet:///modules/mvpcreator/webserver/apache-deflate.conf",
   }
   exec {'a2enmod deflate':
     creates => '/etc/apache2/mods-enabled/deflate.load',
     notify => Service['apache2'],
-	require => File['/etc/apache2/mods-available/deflate.conf'],
+    require => File['/etc/apache2/mods-available/deflate.conf'],
   }
 
   # Configure to run with FastCGI
@@ -112,7 +135,7 @@ class mvpcreator::webserver (
   file {'/var/aegir/.drush/provision_ssl_fixes':
     ensure => present,
     source => "puppet:///modules/mvpcreator/webserver/provision_ssl_fixes",
-	recurse => true,
+    recurse => true,
   }
 }
 
