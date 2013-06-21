@@ -21,3 +21,9 @@ To provision a new core, make a GET request to this URL:
 
  * 'solr' is listed in your /etc/hosts file with the IP of the server actually running SOLR.
 
+### NOTES ###
+
+If you accidentally install an additional Java that only is a JRE (as opposed to JDK), it can break
+Apache SOLR. This is because SOLR needs 'javac' for JSP and Debian will let you still multiple Java's
+and sometimes pick the wrong one.
+
