@@ -4,9 +4,31 @@ class mvpcreator::apache_solr {
     ensure => 'installed',
   }
 
+  File {
+    owner  => 'root',
+    group  => 'root',
+  }
+
+  file {'/etc/apt/sources.list.d/opscode.list':
+    ensure => present,
+    source => "puppet:///modules/mvpcreator/apache_solr/apt-opscode.list",
+    notify => Exec['update_apt'],
+  }
+
+  file {'/etc/apt/preferences.d/solr-jetty.pref':
+    ensure => present,
+    source => "puppet:///modules/mvpcreator/apache_solr/solr-jetty.pref",
+    notify => Exec['update_apt'],
+  }
+
   package {'solr-jetty':
     ensure  => 'installed',
-    require => Package['openjdk-6-jdk'],
+    require => [
+      Package['openjdk-6-jdk'],
+      File['/etc/apt/sources.list.d/opscode.list'],
+      File['/etc/apt/preferences.d/solr-jetty.pref'],
+      Exec['update_apt'],
+    ],
   }
 
   include mvpcreator::apache_solr_config

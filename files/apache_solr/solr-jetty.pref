@@ -1,0 +1,3 @@
+Package: solr-jetty
+Pin: release a=opscode
+Pin-Priority: 1001
